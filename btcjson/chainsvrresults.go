@@ -596,6 +596,10 @@ type ValidateAddressChainResult struct {
 // estimatesmartfee command
 type EstimateSmartFeeResult struct {
 	FeeRate *float64 `json:"feerate,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
+	Blocks  int64    `json:"blocks"`
+}
+
 var _ json.Unmarshaler = &FundRawTransactionResult{}
 
 type rawFundRawTransactionResult struct {
