@@ -313,6 +313,39 @@ func NewGetWalletInfoCmd() *GetWalletInfoCmd {
 	return &GetWalletInfoCmd{}
 }
 
+// BackupWalletCmd defines the backupwallet JSON-RPC command
+type BackupWalletCmd struct {
+	Destination string
+}
+
+// NewBackupWalletCmd returns a new instance which can be used to issue a
+// backupwallet JSON-RPC command
+func NewBackupWalletCmd(destination string) *BackupWalletCmd {
+	return &BackupWalletCmd{Destination: destination}
+}
+
+// UnloadWalletCmd defines the unloadwallet JSON-RPC command
+type UnloadWalletCmd struct {
+	WalletName string
+}
+
+// NewUnloadWalletCmd returns a new instance which can be used to issue a
+// unloadwallet JSON-RPC command.
+func NewUnloadWalletCmd(walletName string) *UnloadWalletCmd {
+	return &UnloadWalletCmd{WalletName: walletName}
+}
+
+// LoadWalletCmd defines the loadwallet JSON-RPC command
+type LoadWalletCmd struct {
+	WalletName string
+}
+
+// NewLoadWalletCmd returns a new instance which can be used to issue a
+// loadwallet JSON-RPC command
+func NewLoadWalletCmd(walletName string) *LoadWalletCmd {
+	return &LoadWalletCmd{WalletName: walletName}
+}
+
 // ImportPrivKeyCmd defines the importprivkey JSON-RPC command.
 type ImportPrivKeyCmd struct {
 	PrivKey string
@@ -1030,6 +1063,9 @@ func init() {
 
 	MustRegisterCmd("addmultisigaddress", (*AddMultisigAddressCmd)(nil), flags)
 	MustRegisterCmd("addwitnessaddress", (*AddWitnessAddressCmd)(nil), flags)
+	MustRegisterCmd("loadwallet", (*LoadWalletCmd)(nil), flags)
+	MustRegisterCmd("unloadwallet", (*UnloadWalletCmd)(nil), flags)
+	MustRegisterCmd("backupwallet", (*BackupWalletCmd)(nil), flags)
 	MustRegisterCmd("createmultisig", (*CreateMultisigCmd)(nil), flags)
 	MustRegisterCmd("dumpprivkey", (*DumpPrivKeyCmd)(nil), flags)
 	MustRegisterCmd("encryptwallet", (*EncryptWalletCmd)(nil), flags)

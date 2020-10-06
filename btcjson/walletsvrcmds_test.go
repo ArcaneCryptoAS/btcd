@@ -76,6 +76,39 @@ func TestWalletSvrCmds(t *testing.T) {
 			},
 		},
 		{
+			name: "backupwallet",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd("backupwallet", "backup.dat")
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewBackupWalletCmd("backup.dat")
+			},
+			marshalled:   `{"jsonrpc":"1.0","method":"backupwallet","params":["backup.dat"],"id":1}`,
+			unmarshalled: &btcjson.BackupWalletCmd{Destination: "backup.dat"},
+		},
+		{
+			name: "loadwallet",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd("loadwallet", "wallet.dat")
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewLoadWalletCmd("wallet.dat")
+			},
+			marshalled:   `{"jsonrpc":"1.0","method":"loadwallet","params":["wallet.dat"],"id":1}`,
+			unmarshalled: &btcjson.LoadWalletCmd{WalletName: "wallet.dat"},
+		},
+		{
+			name: "unloadwallet",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd("unloadwallet", "wallet.dat")
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewUnloadWalletCmd("wallet.dat")
+			},
+			marshalled:   `{"jsonrpc":"1.0","method":"unloadwallet","params":["wallet.dat"],"id":1}`,
+			unmarshalled: &btcjson.UnloadWalletCmd{WalletName: "wallet.dat"},
+		},
+		{
 			name: "createmultisig",
 			newCmd: func() (interface{}, error) {
 				return btcjson.NewCmd("createmultisig", 2, []string{"031234", "035678"})
