@@ -821,9 +821,8 @@ func NewSearchRawTransactionsCmd(address string, verbose, skip, count *int, vinE
 
 // SendRawTransactionCmd defines the sendrawtransaction JSON-RPC command.
 type SendRawTransactionCmd struct {
-	HexTx         string
-	AllowHighFees *bool `jsonrpcdefault:"false"`
-	MaxFeeRate    *int32
+	HexTx      string
+	MaxFeeRate *int32
 }
 
 // NewSendRawTransactionCmd returns a new instance which can be used to issue a
@@ -833,13 +832,13 @@ type SendRawTransactionCmd struct {
 // for optional parameters will use the default value.
 func NewSendRawTransactionCmd(hexTx string, allowHighFees *bool) *SendRawTransactionCmd {
 	return &SendRawTransactionCmd{
-		HexTx:         hexTx,
-		AllowHighFees: allowHighFees,
+		HexTx: hexTx,
+		// AllowHighFees: allowHighFees,
 	}
 }
 
-// NewSendRawTransactionCmd returns a new instance which can be used to issue a
-// sendrawtransaction JSON-RPC command to a bitcoind node.
+// NewBitcoindSendRawTransactionCmd returns a new instance which can be used to issue a
+// sendrawtransaction JSON-RPC command to a bitcoind node with version greater than 0.19.
 //
 // A 0 maxFeeRate indicates that a maximum fee rate won't be enforced.
 func NewBitcoindSendRawTransactionCmd(hexTx string, maxFeeRate int32) *SendRawTransactionCmd {
