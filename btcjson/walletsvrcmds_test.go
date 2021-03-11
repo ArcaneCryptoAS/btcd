@@ -1808,6 +1808,54 @@ func TestWalletSvrCmds(t *testing.T) {
 				Bip32Derivs: btcjson.Bool(true),
 			},
 		},
+		{
+			name: "bumpfee",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd(
+					"bumpfee",
+					"deadbeef",
+					btcjson.BumpFeeOptions{
+						ConfTarget:   btcjson.Int(5),
+						FeeRate:      btcjson.Int(10),
+						Replaceable:  btcjson.Bool(true),
+						EstimateMode: &btcjson.EstimateModeUnset,
+					})
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewBumpFeeCmd(
+					"deadbeef",
+					&btcjson.BumpFeeOptions{
+						ConfTarget:   btcjson.Int(5),
+						FeeRate:      btcjson.Int(10),
+						Replaceable:  btcjson.Bool(true),
+						EstimateMode: &btcjson.EstimateModeUnset,
+					})
+			},
+			marshalled: `{"jsonrpc":"1.0","method":"bumpfee","params":["deadbeef",{"confTarget":5,"fee_rate":10,"replaceable":true,"estimate_mode":"UNSET"}],"id":1}`,
+			unmarshalled: &btcjson.BumpFeeCmd{
+				Txid:    "deadbeef",
+				Options: &btcjson.BumpFeeOptions{
+					ConfTarget:   btcjson.Int(5),
+					FeeRate:      btcjson.Int(10),
+					Replaceable:  btcjson.Bool(true),
+					EstimateMode: &btcjson.EstimateModeUnset,
+				},
+			},
+		},
+		{
+			name: "bumpfee optional",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd("bumpfee", "deadbeef")
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewBumpFeeCmd("deadbeef", nil)
+			},
+			marshalled: `{"jsonrpc":"1.0","method":"bumpfee","params":["deadbeef"],"id":1}`,
+			unmarshalled: &btcjson.BumpFeeCmd{
+				Txid:    "deadbeef",
+				Options: nil,
+			},
+		},
 	}
 
 	t.Logf("Running %d tests", len(tests))

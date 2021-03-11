@@ -803,6 +803,32 @@ func NewWalletPassphraseChangeCmd(oldPassphrase, newPassphrase string) *WalletPa
 	}
 }
 
+type BumpFeeOptions struct {
+	ConfTarget   *int                          `json:"confTarget"`
+	FeeRate      *int                          `json:"fee_rate"`
+	Replaceable  *bool                         `json:"replaceable"`
+	EstimateMode *EstimateSmartFeeMode `json:"estimate_mode"`
+}
+
+
+// BumpFeeCmd defines the bumpfee JSON-RPC command.
+type BumpFeeCmd struct {
+	Txid    string
+	Options *BumpFeeOptions
+}
+
+// NewGetNewAddressCmd returns a new instance which can be used to issue a
+// bumpfee JSON-RPC command.
+//
+// The parameters which are pointers indicate they are optional.  Passing nil
+// for optional parameters will use the default value.
+func NewBumpFeeCmd(txid string, option *BumpFeeOptions) *BumpFeeCmd {
+	return &BumpFeeCmd{
+		Txid:    txid,
+		Options: option,
+	}
+}
+
 // TimestampOrNow defines a type to represent a timestamp value in seconds,
 // since epoch.
 //
@@ -1141,4 +1167,5 @@ func init() {
 	MustRegisterCmd("walletpassphrasechange", (*WalletPassphraseChangeCmd)(nil), flags)
 	MustRegisterCmd("walletcreatefundedpsbt", (*WalletCreateFundedPsbtCmd)(nil), flags)
 	MustRegisterCmd("walletprocesspsbt", (*WalletProcessPsbtCmd)(nil), flags)
+	MustRegisterCmd("bumpfee", (*BumpFeeCmd)(nil), flags)
 }

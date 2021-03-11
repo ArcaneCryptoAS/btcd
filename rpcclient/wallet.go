@@ -1130,6 +1130,70 @@ func (r FutureGetRawChangeAddressResult) Receive() (btcutil.Address, error) {
 	return btcutil.DecodeAddress(addr, r.network)
 }
 
+
+// FutureBumpFeeResult is a future promise to deliver the result of a
+// BumpFeeAsync RPC invocation (or an applicable error).
+type FutureBumpFeeResult struct {
+	responseChannel chan *response
+}
+
+type BumpFeeResponse struct {
+	// The base64-encoded unsigned PSBT of the new transaction. Only returned when wallet private keys are disabled.
+	Psbt string `json:"psbt"`
+	// The id of the new transaction. Only returned when wallet private keys are enabled.
+	Txid chainhash.Hash `json:"txid"`
+	// The fee of the replaced transaction.
+	OrigFee btcutil.Amount `json:"origfee"`
+	// The fee of the new transaction.
+	Fee btcutil.Amount `json:"fee"`
+	// Errors encountered during processing (may be empty).
+	Errors []string `json:"errors"`
+}
+
+// Receive waits for the response promised by the future and returns a new
+// address.
+func (r FutureBumpFeeResult) Receive() (BumpFeeResponse, error) {
+	data, err := receiveFuture(r.responseChannel)
+	if err != nil {
+		return BumpFeeResponse{}, err
+	}
+
+	// Unmarshal result into struct.
+	var response BumpFeeResponse
+	err = json.Unmarshal(data, &response)
+	if err != nil {
+		return BumpFeeResponse{}, err
+	}
+
+	return response, nil
+}
+
+// BumpFeeAsync returns an instance of a type that can be used to get the
+// result of the RPC at some future time by invoking the Receive function on the
+// returned instance.
+//
+// See BumpFee for the blocking version and more details.
+func (c *Client) BumpFeeAsync(txid chainhash.Hash, options ...btcjson.BumpFeeOptions) FutureBumpFeeResult {
+	if len(options) > 1 {
+		panic("can only provide one option")
+	}
+	var option btcjson.BumpFeeOptions
+	if len(options) == 1 {
+		option = options[0]
+	}
+
+	cmd := btcjson.NewBumpFeeCmd(txid.String(), &option)
+	result := FutureBumpFeeResult{
+		responseChannel: c.sendCmd(cmd),
+	}
+	return result
+}
+
+// BumpFee bumps the fee for a txid
+func (c *Client) BumpFee(txid chainhash.Hash, options ...btcjson.BumpFeeOptions) (BumpFeeResponse, error) {
+	return c.BumpFeeAsync(txid, options...).Receive()
+}
+
 // GetRawChangeAddressAsync returns an instance of a type that can be used to
 // get the result of the RPC at some future time by invoking the Receive
 // function on the returned instance.
