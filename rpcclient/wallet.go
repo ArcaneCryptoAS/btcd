@@ -1130,39 +1130,25 @@ func (r FutureGetRawChangeAddressResult) Receive() (btcutil.Address, error) {
 	return btcutil.DecodeAddress(addr, r.network)
 }
 
-
 // FutureBumpFeeResult is a future promise to deliver the result of a
 // BumpFeeAsync RPC invocation (or an applicable error).
 type FutureBumpFeeResult struct {
 	responseChannel chan *response
 }
 
-type BumpFeeResponse struct {
-	// The base64-encoded unsigned PSBT of the new transaction. Only returned when wallet private keys are disabled.
-	Psbt string `json:"psbt"`
-	// The id of the new transaction. Only returned when wallet private keys are enabled.
-	Txid chainhash.Hash `json:"txid"`
-	// The fee of the replaced transaction.
-	OrigFee btcutil.Amount `json:"origfee"`
-	// The fee of the new transaction.
-	Fee btcutil.Amount `json:"fee"`
-	// Errors encountered during processing (may be empty).
-	Errors []string `json:"errors"`
-}
-
 // Receive waits for the response promised by the future and returns a new
 // address.
-func (r FutureBumpFeeResult) Receive() (BumpFeeResponse, error) {
+func (r FutureBumpFeeResult) Receive() (*btcjson.BumpFeeResponse, error) {
 	data, err := receiveFuture(r.responseChannel)
 	if err != nil {
-		return BumpFeeResponse{}, err
+		return nil, err
 	}
 
 	// Unmarshal result into struct.
-	var response BumpFeeResponse
+	var response *btcjson.BumpFeeResponse
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		return BumpFeeResponse{}, err
+		return nil, err
 	}
 
 	return response, nil
@@ -1190,7 +1176,7 @@ func (c *Client) BumpFeeAsync(txid chainhash.Hash, options ...btcjson.BumpFeeOpt
 }
 
 // BumpFee bumps the fee for a txid
-func (c *Client) BumpFee(txid chainhash.Hash, options ...btcjson.BumpFeeOptions) (BumpFeeResponse, error) {
+func (c *Client) BumpFee(txid chainhash.Hash, options ...btcjson.BumpFeeOptions) (*btcjson.BumpFeeResponse, error) {
 	return c.BumpFeeAsync(txid, options...).Receive()
 }
 

@@ -804,12 +804,24 @@ func NewWalletPassphraseChangeCmd(oldPassphrase, newPassphrase string) *WalletPa
 }
 
 type BumpFeeOptions struct {
-	ConfTarget   *int                          `json:"confTarget"`
-	FeeRate      *int                          `json:"fee_rate"`
-	Replaceable  *bool                         `json:"replaceable"`
+	ConfTarget   *int                  `json:"confTarget"`
+	FeeRate      *int                  `json:"fee_rate"`
+	Replaceable  *bool                 `json:"replaceable"`
 	EstimateMode *EstimateSmartFeeMode `json:"estimate_mode"`
 }
 
+type BumpFeeResponse struct {
+	// The base64-encoded unsigned PSBT of the new transaction. Only returned when wallet private keys are disabled.
+	Psbt string `json:"psbt"`
+	// The id of the new transaction. Only returned when wallet private keys are enabled.
+	Txid string `json:"txid"`
+	// The fee of the replaced transaction, measured in bitcoin
+	OrigFee float64 `json:"origfee"`
+	// The fee of the new transaction, measured in bitcoin
+	Fee float64 `json:"fee"`
+	// Errors encountered during processing (may be empty).
+	Errors []string `json:"errors"`
+}
 
 // BumpFeeCmd defines the bumpfee JSON-RPC command.
 type BumpFeeCmd struct {
@@ -817,7 +829,7 @@ type BumpFeeCmd struct {
 	Options *BumpFeeOptions
 }
 
-// NewGetNewAddressCmd returns a new instance which can be used to issue a
+// NewBumpFeeCmd returns a new instance which can be used to issue a
 // bumpfee JSON-RPC command.
 //
 // The parameters which are pointers indicate they are optional.  Passing nil
